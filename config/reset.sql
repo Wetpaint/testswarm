@@ -4,7 +4,7 @@ TRUNCATE clients;
 TRUNCATE run_useragent;
 TRUNCATE runs;
 TRUNCATE jobs;
-TRUNCATE users; -- Optional
+-- TRUNCATE users; -- Optional
 
 -- Resets just the results from clients
 UPDATE jobs SET `status`=0 WHERE 1=1;
