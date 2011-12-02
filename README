@@ -39,6 +39,9 @@ http://testswarm.me/?auth=12345key&job_name=goodjob&max=5&user=jim&browsers=all&
 TO SETUP testswarm:
 https://github.com/jquery/testswarm/wiki
 http://blog.jcoglan.com/2011/07/20/refactoring-towards-testable-javascript-part-3/
+http://wiki.collectionspace.org/display/collectionspace/Step+1+-+Notes+for+Installing+TestSwarm
+http://wiki.collectionspace.org/display/collectionspace/Step+2+-+TestSwarm+Notes+Adding+User%2C+Adding+Basic+Jobs
+http://sweetnr.com/post/integrating-test-swarm-with-hudson
 
 </Wetpaint>
 
