@@ -23,6 +23,7 @@ my $MAX_RUNS = 5;
 # The directory in which the checkouts will occur.
 #my $BASE_DIR = "/srv/swarm.jquery.org/htdocs/git/jquery";
 my $BASE_DIR = "/Users/jmontgomery/wetpaint/wetpaint.com";
+my $TRACK_COMPLETED = "/Users/jmontgomery/wetpaint/testswarm/log/wetpaint.com/done.txt";
 
 # The name of the job that will be submitted
 # (pick a descriptive, but short, name to make it easy to search)
@@ -45,9 +46,10 @@ my $BROWSERS = "all";
 # (can be any number of suites)
 
 ## insert static suite list here
-my $SUITE = "http://testswarm.wetpaint.me:81/tests";
+my $SUITE = "$SWARM/tests";
 my %SUITES = (
-	basic => "$SUITE/test.html"
+	basic => "$SUITE/test.html",
+	alt => "$SUITE/test.html"
 );
 # sets up curl calls like:
 # curl -d "auth=85d8b5f53fd373788319aa69a39288cd05595e01&job_name=wetpaint%2Ecom%20commit%20%3Ca%20href%3D%22https%3A%2F%2Fgithub%2Ecom%2FWetpaint%2Fwetpaint%2Ecom%2Fcommit%2F3e9e94d814ab13a115dce8a15c9990da6e6993aa%22%3E%233e9e94d%3C%2Fa%3E&max=5&user=jmontgomery&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http%3A%2F%2Ftestswarm%2Ewetpaint%2Eme%3A81%2Ftests%2Ftest%2Ehtml" http://testswarm.wetpaint.me:81
@@ -70,7 +72,7 @@ chdir( $BASE_DIR );
 
 print "git log -$NUM --reverse --pretty='format:%H'\n" if ( $DEBUG );
 my @revs = split(/\n/, `git log -$NUM --reverse --pretty='format:%H'`);
-my %done = map { $_ => 1 } split(/\n/, `cat $BASE_DIR/done.txt`);
+my %done = map { $_ => 1 } split(/\n/, `cat $TRACK_COMPLETED`);
 
 foreach my $frev ( @revs ) {
 	my $rev = $frev;
@@ -127,7 +129,7 @@ print " + BUILD_SUITES() \n" if ($DEBUG);
 
 print "Saving completed revisions.\n" if ( $DEBUG );
 
-open( DONE, ">$BASE_DIR/done.txt");
+open( DONE, ">$TRACK_COMPLETED");
 foreach my $key ( keys %done ) {
 	print DONE "$key\n";
 }

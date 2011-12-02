@@ -1,10 +1,46 @@
 
+<Wetpaint>
+
 TestSwarm documentation:
 https://github.com/jquery/testswarm/wiki
 Source:
+https://github.com/Wetpaint/testswarm
+Upstream source:
 https://github.com/jquery/testswarm
 
+TO ADD a project:
+create a directory in /log/ with the repo name (eg /log/wetpaint.com/)
+copy the /scripts/wetpaint.com.pl and set it up for that project
+run the script: cd scripts && perl wetpaint.com.pl
+start running tests by visiting the testswarm address and joining the swarm: http://testswarm.wetpaint.me
 
+TO ADD tests:
+write your QUnit test
+add a script tag for /js/inject.js and put the test into the right project under /tests/ (eg /tests/wetpaint.com/some_test.html)
+
+TO WRITE QUnit tests:
+http://docs.jquery.com/QUnit
+
+TO add jobs:
+run the perl script, or do so manually (details next)
+
+TO manually add a job to testswarm:
+http://testswarm.me/?auth=12345key&job_name=goodjob&max=5&user=jim&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http://testswarm.me/tests/test.html
+	auth=12345key and 
+	user=jim are setup by signing up to your testswarm and then getting the user and auth value from the testswarm mysql db users table
+	job_name=label is whatever string you want
+	max=5 the max number of times to run the test
+	browsers=all values are explained in the sample scripts
+	suites[]=label are arbitrary as far as I can tell
+	urls[]=http... are fully qualified address of your test (each with the /js/inject.js added per the testswarm wiki)
+	output=dump not sure what other options exist
+	state=addjob this adds the job
+
+TO SETUP testswarm:
+https://github.com/jquery/testswarm/wiki
+http://blog.jcoglan.com/2011/07/20/refactoring-towards-testable-javascript-part-3/
+
+</Wetpaint>
 
 TestSwarm v0.2.0pre - Distributed continuous integration for JavaScript.
 
