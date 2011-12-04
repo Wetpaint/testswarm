@@ -47,7 +47,9 @@ window.wp = {
 		var url;
 		this.currentTest = this.tests.shift();
 		url = this.currentTest.page;
-		if(!this.currentTest) return console.log('finished'); // finished
+		if(!this.currentTest){
+			return console.log('finished'); // finished
+		};
 		if(url.indexOf('http') != 0) url =  wp.domain.concat(url);
 		document.getElementById('testiframe').src = url;
 	}
@@ -92,7 +94,7 @@ window.onload = function(){
 	$(tag).load(wp.iframeload);
 	wp.next();
 };
-wp.tests = [
+wp.tests.push(
 	{
 		page:'/',
 		module: 'generic example',
@@ -111,5 +113,8 @@ test('expect 2', function(){
 });
 		} // run
 	} //, // test1
-];
+);
 
+// TODO load tests as test.js and have each loaded script push the tests into wp.tests, then kickoff themselves
+// ie wp.tests.push(<the-tests>);if !wp.currentTest; wp.next();
+//
