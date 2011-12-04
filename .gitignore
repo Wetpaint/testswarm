@@ -1,5 +1,4 @@
-#js/qunit/
-log/*/done.txt
+done.txt
 *.swp
 *.swo
 Icon?
