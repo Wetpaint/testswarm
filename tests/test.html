@@ -6,12 +6,6 @@
 <script type="text/javascript" src="/js/inject.js"></script>
 </head><body>
 <script>
-if (typeof TestSwarm === 'undefined') TestSwarm = {
-          submit: function(result) {
-            if (window.console) console.log('result',result);
-          },
-          heartbeat: function() {}
-        }
 $(function(){
 test("basic pass", function(){
 	ok(1, 'good');
