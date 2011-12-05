@@ -15,14 +15,14 @@ run the script: cd scripts && perl wetpaint.com.pl
 start running tests by visiting the testswarm address and joining the swarm: http://testswarm.wetpaint.me
 
 TO ADD tests:
-write your QUnit test
-add a script tag for /js/inject.js and put the test into the right project under /tests/ (eg /tests/wetpaint.com/some_test.html)
+read the HOWTO in /tests/ and see the sample in that directory.
 
 TO WRITE QUnit tests:
-http://docs.jquery.com/QUnit
+see the HOWTO in /tests/
 
 TO add jobs:
 run the perl script, or do so manually (details next)
+or setup the job via Hudson
 
 TO manually add a job to testswarm:
 http://testswarm.me/?auth=12345key&job_name=goodjob&max=5&user=jim&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http://testswarm.me/tests/test.html
