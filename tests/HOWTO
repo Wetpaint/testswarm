@@ -1,0 +1,20 @@
+
+How to setup tests 2011 Dec jmontgomery
+
+1 copy the sample iframe to the target project so that the iframe will run same-domain
+	eg copy /tests/iframe_sample.html so it's located at http://wetpaint.me/test_iframe.html
+
+2 in the copy edit the options so the options.testpath points to the path of your test javascript on the testswarm server
+	eg /tests/wetpaint.com/tests.js
+
+3 write QUnit tests in that javascript file, see /tests/tests.js for an example, 
+	read the docs/tutorials at: http://docs.jquery.com/QUnit
+	each test object can have the following properties, and is pushed into the wp.tests array:
+	{
+		page: '/path/to/page'
+		module: 'your module name'
+		run: function with the actual tests
+		setup: optional setup function (per QUnit docs)
+		teardown: optional teardown function (per QUnit docs)
+	}
+

@@ -2,11 +2,11 @@
  * An iframe in that domain loads this script
  * which instruments the iframe and runs QUnit tests for the site.
  * */
+options = options || {};
 window.wp = {
-	//domain: 'http://wetpaint.me',
-	domain:'http://testswarm.wetpaint.me:81',
+	domain:location.protocol.concat('//',location.host), // same domain as test iframe
 	swarm:'http://testswarm.wetpaint.me:81',
-	testpath:'/tests/wetpaint.com/tests.js',
+	testpath: options.testpath || '',
 	tests: [],
 	currentTest: false,
 	mk: function(tag, attr){
@@ -64,7 +64,7 @@ window.wp = {
 	p.appendChild(mk('script', {src: swarm.concat('/js/jquery.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/js/inject.js')}));
-	p.appendChild(mk('script', {src: swarm.concat( wp.swarm.concat(wp.testpath) )}));
+	if(wp.testpath) p.appendChild(mk('script', {src: swarm.concat( wp.testpath )}));
 })();
 window.onload = function(){
 	var $;
@@ -91,7 +91,7 @@ window.onload = function(){
 		tag.appendChild(document.createTextNode(txt));
 		f.appendChild(tag);
 	};
-	tag = wp.mk('iframe',{id:'testiframe',height:700,width:1000});
+	tag = wp.mk('iframe',{id:'testiframe',height:700,width:'100%'});
 	f.appendChild(tag);
 	document.body.appendChild(f);
 	$(tag).load(wp.iframeload);
@@ -99,10 +99,15 @@ window.onload = function(){
 };
 
 
-/* wp.swarm + wp.testpath is loaded, it pushes the tests into wp.tests and calls wp.next() to start running them:
-// ie wp.tests.push(<the-tests>);if(!wp.currentTest) wp.next();
+/* wp.swarm + wp.testpath is loaded, it pushes the tests into wp.tests
+// ie wp.tests.push(<the-tests>);
+// each test has:
+//	page: '/path/to/page'
+//	module: 'your module name'
+//	run: function with the actual tests
+//	setup: optional setup function (per QUnit docs)
+//	teardown: optional teardown function (per QUnit docs)
 // eg 
-*/
 wp.tests.push({
 	page:'/',
 	module: 'generic example',
@@ -121,4 +126,4 @@ wp.tests.push({
 		});
 	}
 });
-if(!wp.currentTest) wp.next();
+*/
