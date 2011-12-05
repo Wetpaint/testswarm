@@ -1,9 +1,7 @@
 wp.tests.push({
 	page:'/',
-	module: 'generic example',
-	setup: function(){ console.log('setup'); },
-	teardown: function(){ console.log('teardown'); },
 	run: function(){
+		module('sample');
 		test('basic pass', function(){
 			ok(1, 'good');
 			var h = 'h';

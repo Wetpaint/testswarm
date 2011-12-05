@@ -4,6 +4,7 @@
  * */
 options = options || {};
 window.wp = {
+	modules: {},
 	domain:location.protocol.concat('//',location.host), // same domain as test iframe
 	swarm:'http://testswarm.wetpaint.me:81',
 	testpath: options.testpath || '',
@@ -18,25 +19,13 @@ window.wp = {
 	},
 	iframeload: function(){
 		var $, currentTest = wp.currentTest;
-		$ = window.$ = window.jQuery = window.frames[0].jQuery;
+		window.page = wp.page = window.frames[0];
+		$ = window.$ = window.jQuery = page.jQuery;
+
 		// wait for each ajax call, do we want this?
 		//$.ajaxSetup({async:false});
 		// turn off animations
 		//$.fx.off = true;
-		module(
-		(currentTest.module || 'testing ').concat(currentTest.page),
-		{
-			setup: function(){
-				try{
-				if(currentTest.setup) currentTest.setup();
-				}catch(err){ console.log('error in setup:',err); };
-			},
-			teardown: function(){
-				try{
-				if(currentTest.teardown) currentTest.teardown();
-				}catch(err){ console.log('error in teardown:',err); };
-			}
-		});
 		try{
 			currentTest.run();
 		}catch(err){
@@ -68,7 +57,7 @@ window.wp = {
 })();
 window.onload = function(){
 	var $;
-	$ = window.jq = window.jQuery.noConflict(true);
+	if(window.jQuery) $ = window.jq = window.jQuery.noConflict(true);
 	window.$ = window.jQuery = false;
 	var tags = [
 		{h1: ["qunit-header", "QUnit"]},
@@ -103,17 +92,12 @@ window.onload = function(){
 // ie wp.tests.push(<the-tests>);
 // each test has:
 //	page: '/path/to/page'
-//	module: 'your module name'
 //	run: function with the actual tests
-//	setup: optional setup function (per QUnit docs)
-//	teardown: optional teardown function (per QUnit docs)
 // eg 
 wp.tests.push({
 	page:'/',
-	module: 'generic example',
-	setup: function(){ console.log('setup'); },
-	teardown: function(){ console.log('teardown'); },
 	run: function(){
+		module('sample');
 		test('basic pass', function(){
 			ok(1, 'good');
 			var h = 'h';
