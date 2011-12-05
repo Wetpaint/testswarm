@@ -6,6 +6,7 @@ How to setup tests
 
 2 in the copy edit the options so the options.testpath points to the path of your test javascript on the testswarm server
 	eg /tests/wetpaint.com/tests.js
+	for 2 scripts: /path/to/test1,/path/to/test2,http:.../path/to/test3
 
 3 write QUnit tests in that javascript file, see /tests/tests.js for an example, 
 	read the docs/tutorials at: http://docs.jquery.com/QUnit

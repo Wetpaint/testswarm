@@ -53,7 +53,13 @@ window.wp = {
 	p.appendChild(mk('script', {src: swarm.concat('/js/jquery.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/js/inject.js')}));
-	if(wp.testpath) p.appendChild(mk('script', {src: swarm.concat( wp.testpath )}));
+	if(wp.testpath){
+		var item, i=0, list = wp.testpath.split(',');
+		while(item = list[i++]){
+			item = (item.indexOf('http') == 0) ? item : swarm.concat( item );
+			p.appendChild(mk('script', {src: item}));
+		};
+	};
 })();
 window.onload = function(){
 	var $;
