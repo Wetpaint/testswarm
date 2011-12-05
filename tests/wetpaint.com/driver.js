@@ -6,6 +6,7 @@ window.wp = {
 	//domain: 'http://wetpaint.me',
 	domain:'http://testswarm.wetpaint.me:81',
 	swarm:'http://testswarm.wetpaint.me:81',
+	testpath:'/tests/wetpaint.com/tests.js',
 	tests: [],
 	currentTest: false,
 	mk: function(tag, attr){
@@ -21,7 +22,7 @@ window.wp = {
 		// wait for each ajax call, do we want this?
 		//$.ajaxSetup({async:false});
 		// turn off animations
-		$.fx.off = true;
+		//$.fx.off = true;
 		module(
 		(currentTest.module || 'testing ').concat(currentTest.page),
 		{
@@ -44,12 +45,13 @@ window.wp = {
 		wp.next();
 	},
 	next: function(){
+		if(document.readyState != 'complete') return;
 		var url;
 		this.currentTest = this.tests.shift();
-		url = this.currentTest.page;
 		if(!this.currentTest){
 			return console.log('finished'); // finished
 		};
+		url = this.currentTest.page;
 		if(url.indexOf('http') != 0) url =  wp.domain.concat(url);
 		document.getElementById('testiframe').src = url;
 	}
@@ -62,6 +64,7 @@ window.wp = {
 	p.appendChild(mk('script', {src: swarm.concat('/js/jquery.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/js/inject.js')}));
+	p.appendChild(mk('script', {src: swarm.concat( wp.swarm.concat(wp.testpath) )}));
 })();
 window.onload = function(){
 	var $;
@@ -94,27 +97,28 @@ window.onload = function(){
 	$(tag).load(wp.iframeload);
 	wp.next();
 };
-wp.tests.push(
-	{
-		page:'/',
-		module: 'generic example',
-		setup: function(){ console.log('setup'); },
-		teardown: function(){ console.log('teardown'); },
-		run: function(){
-test('basic pass', function(){
-	ok(1, 'good');
-	var h = 'h';
-	equal(h, 'h','h is h, so we are good');
-});
-test('expect 2', function(){
-	expect(2);
-	equal(1, 0, 'failing test');
-	equal(1, 1, 'passing test');
-});
-		} // run
-	} //, // test1
-);
 
-// TODO load tests as test.js and have each loaded script push the tests into wp.tests, then kickoff themselves
-// ie wp.tests.push(<the-tests>);if !wp.currentTest; wp.next();
-//
+
+/* wp.swarm + wp.testpath is loaded, it pushes the tests into wp.tests and calls wp.next() to start running them:
+// ie wp.tests.push(<the-tests>);if(!wp.currentTest) wp.next();
+// eg 
+*/
+wp.tests.push({
+	page:'/',
+	module: 'generic example',
+	setup: function(){ console.log('setup'); },
+	teardown: function(){ console.log('teardown'); },
+	run: function(){
+		test('basic pass', function(){
+			ok(1, 'good');
+			var h = 'h';
+			equal(h, 'h','h is h, so we are good');
+		});
+		test('expect 2', function(){
+			expect(2);
+			equal(1, 0, 'failing test');
+			equal(1, 1, 'passing test');
+		});
+	}
+});
+if(!wp.currentTest) wp.next();
