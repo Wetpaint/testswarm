@@ -6,7 +6,7 @@ options = options || {};
 window.wp = {
 	modules: {},
 	domain:location.protocol.concat('//',location.host), // same domain as test iframe
-	swarm:'http://testswarm.wetpaint.me:81',
+	swarm:'http://testswarm.wetpaint.me',
 	testpath: options.testpath || '',
 	tests: [],
 	currentTest: false,
