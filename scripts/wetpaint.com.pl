@@ -5,25 +5,25 @@
 # The location of the TestSwarm that you're going to run against.
 
 #my $SWARM = "http://swarm.jquery.org";
-my $SWARM = "http://testswarm.wetpaint.me:81";
+my $SWARM = "http://testswarm.wetpaint.me";
 
 # Your TestSwarm username.
 my $USER = "jmontgomery";
 
 ## replace this
 # Your authorization token.
-my $AUTH_TOKEN = "85d8b5f53fd373788319aa69a39288cd05595e01";
+my $AUTH_TOKEN = "78c94a024366f3437100a5c5cfbe47a3e2c199d5";
 
 # The number of commits to search back through
-my $NUM = 20;
+my $NUM = 5;
 
 # The maximum number of times you want the tests to be run.
-my $MAX_RUNS = 5;
+my $MAX_RUNS = 3;
 
 # The directory in which the checkouts will occur.
 #my $BASE_DIR = "/srv/swarm.jquery.org/htdocs/git/jquery";
-my $BASE_DIR = "/Users/jmontgomery/wetpaint/wetpaint.com";
-my $TRACK_COMPLETED = "/Users/jmontgomery/wetpaint/testswarm/log/wetpaint.com/done.txt";
+my $BASE_DIR = "/home/testswarm/wetpaint/wetpaint.com";
+my $TRACK_COMPLETED = "/home/testswarm/wetpaint/testswarm/log/wetpaint.com/done.txt";
 
 # The name of the job that will be submitted
 # (pick a descriptive, but short, name to make it easy to search)
@@ -48,8 +48,7 @@ my $BROWSERS = "all";
 ## insert static suite list here
 my $SUITE = "$SWARM/tests";
 my %SUITES = (
-	basic => "$SUITE/test.html",
-	alt => "$SUITE/test.html"
+	basic => "http://www.develop.wetpaint.me/testswarm_qunit_tests.html"
 );
 # sets up curl calls like:
 # curl -d "auth=85d8b5f53fd373788319aa69a39288cd05595e01&job_name=wetpaint%2Ecom%20commit%20%3Ca%20href%3D%22https%3A%2F%2Fgithub%2Ecom%2FWetpaint%2Fwetpaint%2Ecom%2Fcommit%2F3e9e94d814ab13a115dce8a15c9990da6e6993aa%22%3E%233e9e94d%3C%2Fa%3E&max=5&user=jmontgomery&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http%3A%2F%2Ftestswarm%2Ewetpaint%2Eme%3A81%2Ftests%2Ftest%2Ehtml" http://testswarm.wetpaint.me:81
