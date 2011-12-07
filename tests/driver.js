@@ -3,6 +3,7 @@
  * which instruments the iframe and runs QUnit tests for the site.
  * */
 options = options || {};
+if(!window.console) console = {log:function(){}};
 window.wp = {
 	modules: {},
 	domain:location.protocol.concat('//',location.host), // same domain as test iframe
@@ -19,28 +20,31 @@ window.wp = {
 	},
 	iframeload: function(){
 		var $, currentTest = wp.currentTest;
-		window.page = wp.page = window.frames[0];
-		$ = window.$ = window.jQuery = page.jQuery;
+		if(!wp.currentTest) return;
 
 		// wait for each ajax call, do we want this?
 		//$.ajaxSetup({async:false});
 		// turn off animations
 		//$.fx.off = true;
+		setTimeout(function(){
+		window.page = wp.page = window.frames[0];
+		$ = window.$ = window.jQuery = page.jQuery;
+			wp.currentTest.run();
 		try{
-			currentTest.run();
 		}catch(err){
 			console.log('error running QUnit currentTest',err);
 		};
-		wp.next();
+		setTimeout(wp.next,100);
+		},0);
 	},
 	next: function(){
 		if(document.readyState != 'complete') return;
 		var url;
-		this.currentTest = this.tests.shift();
-		if(!this.currentTest){
+		wp.currentTest = wp.tests.shift();
+		if(!wp.currentTest){
 			return console.log('finished'); // finished
 		};
-		url = this.currentTest.page;
+		url = wp.currentTest.page;
 		if(url.indexOf('http') != 0) url =  wp.domain.concat(url);
 		document.getElementById('testiframe').src = url;
 	}
@@ -62,8 +66,8 @@ window.wp = {
 	};
 })();
 window.onload = function(){
-	var $;
-	if(window.jQuery) $ = window.jq = window.jQuery.noConflict(true);
+	var jq;
+	if(window.jQuery) jq = window.jq = window.jQuery.noConflict(true);
 	window.$ = window.jQuery = false;
 	var tags = [
 		{h1: ["qunit-header", "QUnit"]},
@@ -87,12 +91,12 @@ window.onload = function(){
 		f.appendChild(tag);
 	};
 	tag = wp.mk('iframe',{id:'testiframe',height:700,width:'100%'});
+	jq(tag).load(wp.iframeload);
 	f.appendChild(tag);
+	//window.jq(tag).load(wp.iframeload);
 	document.body.appendChild(f);
-	$(tag).load(wp.iframeload);
 	wp.next();
 };
-
 
 /* wp.swarm + wp.testpath is loaded, it pushes the tests into wp.tests
 // ie wp.tests.push(<the-tests>);

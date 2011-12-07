@@ -48,6 +48,7 @@ wp.modules.domains = function(){
 
 };
 
+
 wp.tests.push(
 {
 	page:'/',
