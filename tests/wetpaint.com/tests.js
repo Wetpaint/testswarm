@@ -3,6 +3,25 @@ wp.modules.core = function(){
 		console.log(page,'title',page.document.title,'loc',page.location.href);
 	});
 };
+wp.modules.likegate = function(){
+	module('likegate');
+	console.log('likegate, likes:',$.cookie('wpLikes'),', likegated?',$.cookie('wpLikegate'),', visit:',$.cookie('wpVisit'));
+
+	asyncTest('likegate tests', function(){
+		expect(3);
+		function theTest(){
+			equal($('#likegate').is(':visible'), true, 'likegate is showing');
+			ok($('#likegate').parent()[0], 'likegate has a parent');
+			equal(/\blikegate\b/.test($('#likegate').parent()[0].className), true, 'parent.likegate parentNode class includes "likegate"');
+			
+			start();
+		};
+
+		if(page.getElementById('likegate')) theTest();
+		else $(page.wp).bind('likesdefined', theTest);
+	});
+
+};
 wp.modules.domains = function(){
 	module('wp.domains');
 
@@ -59,10 +78,14 @@ wp.tests.push(
 	}
 }, {
 	page:'/network/gallery/red-carpet-alert-celebs-at-the-2011-trevor-live-event',
+	before: function(){
+		window.name = ''; $.cookie('wpLikes',''); $.cookie('wpLikegate',''); $.cookie('wpVisit',2);
+	},
 	run: function(){
 		var module = wp.modules;
 		module.core();
 		module.domains();
+		module.likegate();
 	}
 }
 );

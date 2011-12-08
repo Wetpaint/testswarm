@@ -15,10 +15,10 @@ my $USER = "jmontgomery";
 my $AUTH_TOKEN = "78c94a024366f3437100a5c5cfbe47a3e2c199d5";
 
 # The number of commits to search back through
-my $NUM = 5;
+my $NUM = 1;
 
 # The maximum number of times you want the tests to be run.
-my $MAX_RUNS = 3;
+my $MAX_RUNS = 1;
 
 # The directory in which the checkouts will occur.
 #my $BASE_DIR = "/srv/swarm.jquery.org/htdocs/git/jquery";
