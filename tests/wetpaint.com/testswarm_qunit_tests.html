@@ -4,6 +4,17 @@
 var options = {
 	testpath:'/tests/wetpaint.com/tests.js'
 };
+
+(function(){
+	var js, driver = "http://testswarm.wetpaint.me/tests/driver.js", time = (new Date).getTime(), re = /^.*?driver=([^&]+).*$/;
+	if(re.test(location.hash)){
+	// override the driver location with http://wetpaint.me/testswarm_iframe.html#driver=http://domain/path/to/driver.js
+		driver = location.hash.replace(re,'$1');
+	};
+	js = document.createElement('script');
+	js.type = 'text/javascript';
+	js.src = driver.concat('?',time);
+	document.getElementsByTagName('script')[0].parentNode.appendChild(js);
+})();
 </script>
-<script src="http://testswarm.wetpaint.me:81/tests/driver.js"></script>
 </body></html>
