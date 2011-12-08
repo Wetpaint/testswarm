@@ -29,12 +29,20 @@ window.wp = {
 		setTimeout(function(){
 		window.page = wp.page = window.frames[0];
 		$ = window.$ = window.jQuery = page.jQuery;
-			wp.currentTest.run();
+		try{
+			if(currentTest.before) currentTest.before();
+		}catch(err){
+			console.log('error in before()',err,currentTest);
+		};
 		try{
 			currentTest.run();
+		}catch(err){
+			console.log('error in run()',err,currentTest);
+		};
+		try{
 			if(currentTest.after) currentTest.after();
 		}catch(err){
-			console.log('error running QUnit currentTest',err);
+			console.log('error in after()',err,currentTest);
 		};
 		setTimeout(wp.next,100);
 		},0);
@@ -48,18 +56,13 @@ window.wp = {
 		};
 		url = wp.currentTest.page;
 		if(url.indexOf('http') != 0) url =  wp.domain.concat(url);
-		try{
-			if(this.currentTest.before) this.currentTest.before();
-		}catch(err){
-			console.log('error running QUnit currentTest.before',err);
-		};
 		document.getElementById('testiframe').src = url;
 	}
 };
 (function(){ // setup basics
 	var mk, swarm = wp.swarm;
 	mk = wp.mk;
-	var p = document.getElementsByTagName('script')[0].parentNode;
+	var p = document.getElementsByTagName('script')[0].parentNode, time = (new Date).getTime();
 	p.appendChild(mk('link', {rel: 'stylesheet', href: wp.swarm.concat('/qunit/qunit/qunit.css'), type: 'text/css' }));
 	p.appendChild(mk('script', {src: swarm.concat('/js/jquery.js')}));
 	p.appendChild(mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')}));
@@ -68,7 +71,7 @@ window.wp = {
 		var item, i=0, list = wp.testpath.split(',');
 		while(item = list[i++]){
 			item = (item.indexOf('http') == 0) ? item : swarm.concat( item );
-			p.appendChild(mk('script', {src: item}));
+			p.appendChild(mk('script', {src: item.concat('?',time)}));
 		};
 	};
 })();

@@ -10,14 +10,14 @@ wp.modules.likegate = function(){
 	asyncTest('likegate tests', function(){
 		expect(3);
 		function theTest(){
+			var parent = $('#likegate').parent()[0];
+			ok(parent, 'likegate has a parent');
 			equal($('#likegate').is(':visible'), true, 'likegate is showing');
-			ok($('#likegate').parent()[0], 'likegate has a parent');
-			equal(/\blikegate\b/.test($('#likegate').parent()[0].className), true, 'parent.likegate parentNode class includes "likegate"');
-			
+			ok(' '.concat(parent.className.indexOf('likegate')), 'parentNode className includes "likegate":'.concat(parent.className));
 			start();
 		};
 
-		if(page.getElementById('likegate')) theTest();
+		if($('#likegate').parent()[0].className.indexOf('likegate')) theTest();
 		else $(page.wp).bind('likesdefined', theTest);
 	});
 
@@ -69,6 +69,7 @@ wp.modules.domains = function(){
 
 
 wp.tests.push(
+/*
 {
 	page:'/',
 	run: function(){
@@ -78,6 +79,19 @@ wp.tests.push(
 	}
 }, {
 	page:'/network/gallery/red-carpet-alert-celebs-at-the-2011-trevor-live-event',
+	before: function(){
+		window.name = ''; $.cookie('wpLikes',''); $.cookie('wpLikegate',''); $.cookie('wpVisit',2);
+	},
+	run: function(){
+		var module = wp.modules;
+		module.core();
+		module.domains();
+		module.likegate();
+	}
+},
+*/
+{
+	page:'/bones/articles/wetpaint-exclusive-bones-cast-reveals-how-things-will-change-forever',
 	before: function(){
 		window.name = ''; $.cookie('wpLikes',''); $.cookie('wpLikegate',''); $.cookie('wpVisit',2);
 	},
