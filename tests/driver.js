@@ -28,6 +28,7 @@ window.wp = {
 		//$.fx.off = true;
 		try{
 			currentTest.run();
+			if(currentTest.after) currentTest.after();
 		}catch(err){
 			console.log('error running QUnit currentTest',err);
 		};
@@ -42,6 +43,11 @@ window.wp = {
 		};
 		url = this.currentTest.page;
 		if(url.indexOf('http') != 0) url =  wp.domain.concat(url);
+		try{
+			if(this.currentTest.before) this.currentTest.before();
+		}catch(err){
+			console.log('error running QUnit currentTest.before',err);
+		};
 		document.getElementById('testiframe').src = url;
 	}
 };
