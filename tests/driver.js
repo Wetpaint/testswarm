@@ -3,7 +3,8 @@
  * which instruments the iframe and runs QUnit tests for the site.
  * */
 options = options || {};
-if(!window.console) console = {log:function(){}};
+if(!window.console) console = {log:function(){}, info: function(){}, debug: function(){}};
+
 window.wp = {
 	modules: {},
 	domain:location.protocol.concat('//',location.host), // same domain as test iframe
@@ -87,7 +88,7 @@ window.onload = function(){
 		{ol: ["qunit-tests", ""]},
 		{div: ["qunit-fixture", "test markup, will be hidden"]}
 	];
-	var tag, id, txt, p, f = document.createDocumentFragment();
+	var tag, id, txt, p, f = wp.mk('div',{'id':'qunit-results','style':'width:30%;height:100%;'});
 	while(tag = tags.shift()){
 		for(p in tag){
 			txt = tag[p];
@@ -100,8 +101,11 @@ window.onload = function(){
 		tag.appendChild(document.createTextNode(txt));
 		f.appendChild(tag);
 	};
-	tag = wp.mk('iframe',{id:'testiframe',height:700,width:'100%'});
-	jq(tag).load(wp.iframeload);
+	document.body.setAttribute('style','margin:0;padding:0;');
+	tag = wp.mk('iframe',{id:'testiframe',height:700,width:'70%',height:'100%','style':'border:0;position:absolute;left:30%;top:0;'});
+	jq(tag).ready(function(){
+		console.log('iframe ready',this,this.contentWindow,this.src);
+	}).load(wp.iframeload);
 	f.appendChild(tag);
 	//window.jq(tag).load(wp.iframeload);
 	document.body.appendChild(f);
