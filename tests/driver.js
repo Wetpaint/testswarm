@@ -40,12 +40,14 @@ window.wp = {
 		}catch(err){
 			console.log('error in run()',err,currentTest);
 		};
+/*
 		try{
 			if(currentTest.after) currentTest.after();
 		}catch(err){
 			console.log('error in after()',err,currentTest);
 		};
-		setTimeout(wp.next,100);
+		setTimeout(wp.next,2000);
+*/
 		},0);
 	},
 	next: function(){
@@ -61,6 +63,7 @@ window.wp = {
 	}
 };
 (function(){ // setup basics
+// create required page elements
 	var mk, swarm = wp.swarm;
 	mk = wp.mk;
 	var p = document.getElementsByTagName('script')[0].parentNode, time = (new Date).getTime();
@@ -75,11 +78,6 @@ window.wp = {
 			p.appendChild(mk('script', {src: item.concat('?',time)}));
 		};
 	};
-})();
-window.onload = function(){
-	var jq;
-	if(window.jQuery) jq = window.jq = window.jQuery.noConflict(true);
-	window.$ = window.jQuery = false;
 	var tags = [
 		{h1: ["qunit-header", "QUnit"]},
 		{h2: ["qunit-banner", ""]},
@@ -103,14 +101,24 @@ window.onload = function(){
 	};
 	document.body.setAttribute('style','margin:0;padding:0;');
 	tag = wp.mk('iframe',{id:'testiframe',height:700,width:'70%',height:'100%','style':'border:0;position:absolute;left:30%;top:0;'});
-	jq(tag).ready(function(){
-		console.log('iframe ready',this,this.contentWindow,this.src);
-	}).load(wp.iframeload);
 	f.appendChild(tag);
-	//window.jq(tag).load(wp.iframeload);
 	document.body.appendChild(f);
-	wp.next();
-};
+// wait for QUnit and jQuery to load before starting to load iframe
+	window.initDriver = function(){
+		if(window.jQuery && window.QUnit && QUnit.load){
+			clearTimeout(window.initDriver.timer);
+			QUnit.config.autostart = false;
+			window.jq = window.jQuery.noConflict(true);
+			window.$ = window.jQuery = false;
+			jq('iframe').load(wp.iframeload);
+			if(!document.getElementById('qunit-results').getElementsByTagName('label').length) QUnit.load();
+			wp.next();
+		}else{
+			window.initDriver.timer = setTimeout(window.initDriver,500);
+		};
+	};
+	initDriver();
+})();
 
 /* wp.swarm + wp.testpath is loaded, it pushes the tests into wp.tests
 // ie wp.tests.push(<the-tests>);
