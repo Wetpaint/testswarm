@@ -4,9 +4,34 @@
  * */
 options = options || {};
 if(!window.console) console = {log:function(){}, info: function(){}, debug: function(){}};
-
+try{
+sessionStorage.clear();
+}catch(err){};
 window.wp = {
-	modules: {},
+	expect: 0,
+	completed: 0,
+	module: function(name, callbacks){
+		var o = callbacks || {}, setup = o.setup || function(){},
+			teardown = o.teardown || function(){};
+		QUnit.module(name, {setup: function(){
+				wp.expect++;
+				setup();
+			}, teardown: function(){
+				teardown();
+				wp.completed++;
+				if(wp.expect==wp.completed){
+					var currentTest = wp.currentTest;
+					try{
+						if(currentTest.after) currentTest.after();
+					}catch(err){
+						console.log('error in after()',err,currentTest);
+					};
+					wp.next();
+				};
+			}
+		});
+	},
+	modules: { },
 	domain:location.protocol.concat('//',location.host), // same domain as test iframe
 	swarm:'http://testswarm.wetpaint.me',
 	testpath: options.testpath || '',
@@ -27,7 +52,6 @@ window.wp = {
 		//$.ajaxSetup({async:false});
 		// turn off animations
 		//$.fx.off = true;
-		setTimeout(function(){
 		window.page = wp.page = window.frames[0];
 		$ = window.$ = window.jQuery = page.jQuery;
 		try{
@@ -40,15 +64,6 @@ window.wp = {
 		}catch(err){
 			console.log('error in run()',err,currentTest);
 		};
-/*
-		try{
-			if(currentTest.after) currentTest.after();
-		}catch(err){
-			console.log('error in after()',err,currentTest);
-		};
-		setTimeout(wp.next,2000);
-*/
-		},0);
 	},
 	next: function(){
 		if(document.readyState != 'complete') return;

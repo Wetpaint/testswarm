@@ -1,3 +1,10 @@
+var last = 0;
+setInterval(function(){
+	var e = QUnit.config.current;
+	if(typeof e == 'undefined')  return;
+	if(e.expected != last) console.log('QUnit.current.expected',e.expected);
+	last = e.expected;
+},100);
 wp.modules.core = function(){
 	$(function(){
 		console.log('testing page',page,'title',page.document.title,'loc',page.location.href);
@@ -14,7 +21,7 @@ console.log('ping ...');
 };
 
 wp.modules.likegate = function(index, opt_out){
-	module('likegate');
+	wp.module('likegate');
 	var w = page.wp;
 	asyncTest('likegate showing and dismiss on '.concat(opt_out,' click'), function(){
 		expect(10);
@@ -78,7 +85,7 @@ console.log('_gaq..');
 };
 
 wp.modules.domains = function(option){
-	module('wp.domains');
+	wp.module('wp.domains');
 
 	var undef, p, domains = page.wp.domains, item, counts = {},
 		networkfp = 'http://www.facebook.com/Wetpaint', networkfbid = '5510619796';
@@ -113,7 +120,6 @@ wp.modules.domains = function(option){
 				equal(counts[domains.network.fbid],1,'only one domain with the network facebook id');
 				equal(item, 0, 'no duplicate facebook ids or fanpages');
 	
-				QUnit.start();
 			};
 
 			if(domains.network.fb_fan_page_url.indexOf('http') != 0) $(page.wp).bind('likesdefined',theTest);
@@ -133,13 +139,13 @@ wp.tests.push(
 },
 {
 	page:'/network/gallery/red-carpet-alert-celebs-at-the-2011-trevor-live-event',
-	before: wp.modules.setupAndOpenLikegate,
 	run: function(){
 		var module = wp.modules;
 		module.core();
 		module.domains();
-		module.likegate();
-	}
+		QUnit.start();
+	},
+	after: function(){ console.log('after!'); }
 },
 {
 	page:'/bones/articles/wetpaint-exclusive-bones-cast-reveals-how-things-will-change-forever',
@@ -149,10 +155,10 @@ wp.tests.push(
 		module.core();
 		module.domains();
 		module.likegate(0,'already-like');
+		QUnit.start();
 	},
 	after: function(){
 		console.log('after...');
-//	debugger;
 	}
 }/*,
 {
