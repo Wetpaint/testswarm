@@ -4,3 +4,6 @@
 [submodule "dominator"]
 	path = dominator
 	url = https://github.com/mwbrooks/dominator.js.git
+[submodule "pavlov"]
+	path = pavlov
+	url = https://github.com/mmonteleone/pavlov.git
