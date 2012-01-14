@@ -2,19 +2,37 @@
 <html><body>
 <script>
 var options = {
-	testpath:'/tests/tests.js'
+	testpath:'/tests/wetpaint.com/tests.js',
+	ready: function(){
+		var validDomain = /(testswarm.wetpaint.me|jimmont.wetpaint.me)/;
+		jq(window).bind('message',function(e){
+			e = e.originalEvent;
+			if(!validDomain.test(e.origin)) return;
+			console.log(e.type, e.data);
+		});
+		window.top.postMessage('I\'m loaded!','*'); // TODO replace '*' with  desired domain, like 'http://testswarm.wetpaint.me'
+	}
 };
 
+
 (function(){
-	var js, driver = "http://testswarm.wetpaint.me/tests/driver.js", time = (new Date).getTime(), re = /^.*?driver=([^&]+).*$/;
-	if(re.test(location.hash)){
-	// override the driver location with http://wetpaint.me/testswarm_iframe.html#driver=http://domain/path/to/driver.js
-		driver = location.hash.replace(re,'$1');
+	var js, swarm = 'http://testswarm.wetpaint.me', driver = "/tests/driver.js", time = (new Date).getTime(),
+		swarmIn = /^.*?swarm=([^&]+).*$/;
+		driverIn = /^.*?driver=([^&]+).*$/;
+	if(swarmIn.test(location.hash)){
+	// override the driver location with http://wetpaint.me/testswarm_iframe.html#driver=/path/to/driver.js
+		options.swarm = swarm =  location.hash.replace(swarmIn,'$1');
+	};
+	if(driverIn.test(location.hash)){
+	// override the driver location with http://wetpaint.me/testswarm_iframe.html#driver=/path/to/driver.js
+		options.driver = driver = location.hash.replace(driverIn,'$1');
 	};
 	js = document.createElement('script');
 	js.type = 'text/javascript';
-	js.src = driver.concat('?',time);
+	js.src = (driver.indexOf('http') == 0 ? driver : swarm.concat(driver)).concat('?',time);
 	document.getElementsByTagName('script')[0].parentNode.appendChild(js);
 })();
+
 </script>
 </body></html>
+

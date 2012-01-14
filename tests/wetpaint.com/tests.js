@@ -1,57 +1,56 @@
 var last = 0;
+
 setInterval(function(){
 	var e = QUnit.config.current;
 	if(typeof e == 'undefined')  return;
 	if(e.expected != last) console.log('QUnit.current.expected',e.expected);
 	last = e.expected;
 },100);
-wp.modules.core = function(){
+et.modules.core = function(){
 	$(function(){
 		console.log('testing page',page,'title',page.document.title,'loc',page.location.href);
 	});
 };
-wp.modules.setupAndOpenLikegate = function(){
+et.modules.setupAndOpenLikegate = function(){
 console.log('autostart?',QUnit.config.autostart);
-	var w = page.wp;
-	$.cookie('wpLikegate','', {path:'/',domain:w._domain}); $.cookie('wpVisit',2, {path:'/',domain:w._domain});
-	if(w.domains[w.store_name].like){
-		$(w).trigger('unlike', [{href:w.domains[w.store_name].fb_fan_page_url, widget:{}}]).trigger('likegate');
+	$.cookie('wpLikegate','', {path:'/',domain:wp._domain}); $.cookie('wpVisit',2, {path:'/',domain:wp._domain});
+	if(wp.domains[wp.store_name].like){
+		$(wp).trigger('unlike', [{href:wp.domains[wp.store_name].fb_fan_page_url, widget:{}}]).trigger('likegate');
 	};
-console.log('ping ...');
 };
 
-wp.modules.likegate = function(index, opt_out){
-	wp.module('likegate');
-	var w = page.wp;
+et.modules.likegate = function(index, opt_out){
+	et.module('likegate');
 	asyncTest('likegate showing and dismiss on '.concat(opt_out,' click'), function(){
 		expect(10);
 		stop(3);
 		equal($.cookie('wpLikegate'), '', 'empty wpLikegate cookie (as though none came up this session)');
 		equal($.cookie('wpVisit'), '2', 'wpVisit cookie = 2 (2nd pageview in session)');
-		equal(($.cookie('wpLikes')||'').indexOf(w.domains[w.store_name].key), -1, 'current show not in wpLikes cookie');
+		equal(($.cookie('wpLikes')||'').indexOf(wp.domains[wp.store_name].key), -1, 'current show not in wpLikes cookie');
 		var parent = $('#likegate').parent().get(0);
 		function theTest(e){
 			var parent = $('#likegate').parent().get(0);
 			ok(parent, 'likegate has a parent (exists on page)');
-			ok(!w.domains[w.store_name].like, 'current show is not liked');
+			ok(!wp.domains[wp.store_name].like, 'current show is not liked');
+console.log('parent',parent);
 			ok(/\blikegate\b/.test(parent.className), 'parentNode className includes "likegate":'.concat(parent.className));
 			equal($('#likegate').is(':visible'), true, 'likegate is showing');
 
-			w._testlike = function(e, like){
+			wp._testlike = function(e, like){
 console.log('like..');
-				$(w).unbind('like', w._testlike);
+				$(wp).unbind('like', wp._testlike);
 
 				equal(e.type, 'like', 'like event resulted from click on '.concat(opt_out,' option'));
 				equal($('#likegate').is(':visible'), false, 'likegate closed as a result');
 				start();
 			};
-			w._testgaq = function(e, pushed){
+			wp._testgaq = function(e, pushed){
 console.log('_gaq..');
 				var str = pushed.item.join(',');
 				ok(str.indexOf(opt_out)+1, '_gaq.push got '.concat(opt_out,': ', str));
 				start();
 			};
-			$(w).bind('_gaq',w._testgaq).bind('like',	w._testlike);
+			$(wp).bind('_gaq',wp._testgaq).bind('like',	wp._testlike);
 
 			$('u','#likegate').eq(index).each(function(){
 				var l = $(this), count = 0, fade = function(){
@@ -79,13 +78,13 @@ console.log('_gaq..');
 		};
 
 		page.scrollTo(0, 900);
-		if(w.FB.likesdefined) setTimeout(theTest, 2000, 1);
-		else $(w).bind('likesdefined', theTest);
+		if(wp.FB.likesdefined) setTimeout(theTest, 2000, 1);
+		else $(wp).bind('likesdefined', theTest);
 	});
 };
 
-wp.modules.domains = function(option){
-	wp.module('wp.domains');
+et.modules.domains = function(option){
+	et.module('et.domains');
 
 	var undef, p, domains = page.wp.domains, item, counts = {},
 		networkfp = 'http://www.facebook.com/Wetpaint', networkfbid = '5510619796';
@@ -106,7 +105,6 @@ wp.modules.domains = function(option){
 			if(counts[p] > 1) item++;
 		};
 		}; // setupTest
-
 		asyncTest('site/show object tests', function(){
 			expect(6);
 			function theTest(){
@@ -127,11 +125,11 @@ wp.modules.domains = function(option){
 		});
 };
 
-wp.tests.push(
+et.tests.push(
 {
 	page:'/',
 	run: function(){
-		var module = wp.modules;
+		var module = et.modules;
 		module.core();
 		module.domains();
 		QUnit.start();
@@ -140,7 +138,7 @@ wp.tests.push(
 {
 	page:'/network/gallery/red-carpet-alert-celebs-at-the-2011-trevor-live-event',
 	run: function(){
-		var module = wp.modules;
+		var module = et.modules;
 		module.core();
 		module.domains();
 		QUnit.start();
@@ -149,9 +147,9 @@ wp.tests.push(
 },
 {
 	page:'/bones/articles/wetpaint-exclusive-bones-cast-reveals-how-things-will-change-forever',
-	before: wp.modules.setupAndOpenLikegate,
+	before: et.modules.setupAndOpenLikegate,
 	run: function(){
-		var module = wp.modules;
+		var module = et.modules;
 		module.core();
 		module.domains();
 		module.likegate(0,'already-like');
@@ -163,14 +161,14 @@ wp.tests.push(
 }/*,
 {
 	page:'/americas-next-top-model/articles/why-was-angelea-disqualified-from-americas-next-top-model-allstars',
-	before: wp.modules.setupAndOpenLikegate,
+	before: et.modules.setupAndOpenLikegate,
 	run: function(){
-		var module = wp.modules;
+		var module = et.modules;
 		module.core();
 		module.domains();
 		module.likegate(1,'prefer-twitter');
 	},
-	after: wp.modules.setupAndOpenLikegate
+	after: et.modules.setupAndOpenLikegate
 }
 */
 );
