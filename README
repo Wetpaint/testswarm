@@ -17,6 +17,12 @@ start running tests by visiting the testswarm address and joining the swarm: htt
 TO ADD tests:
 read the HOWTO in /tests/ and see the sample in that directory.
 
+TO CLEANUP old tests:
+ssh dev@hudson.wetpaint.me su - testswarm
+or ssh testswarm@hudson.wetpaint.me
+cd ~testswarm/wetpaint/testswarm/ && rm log/wetpaint.com/done.txt && mysql testswarm -u testswarm -p < config/reset.sql
+
+
 TO WRITE QUnit tests:
 see the HOWTO in /tests/
 
@@ -43,6 +49,8 @@ http://wiki.collectionspace.org/display/collectionspace/Step+1+-+Notes+for+Insta
 http://wiki.collectionspace.org/display/collectionspace/Step+2+-+TestSwarm+Notes+Adding+User%2C+Adding+Basic+Jobs
 http://sweetnr.com/post/integrating-test-swarm-with-hudson
 
+jenkins-testswarm plugin:
+https://github.com/appendto/jenkins-testswarm
 </Wetpaint>
 
 TestSwarm v0.2.0pre - Distributed continuous integration for JavaScript.
