@@ -64,24 +64,48 @@ try{
 		if(url.indexOf('http') != 0) url =  et.domain.concat(url);
 		document.getElementById('testiframe').src = url;
 	},
-	setup: function(){
+	isReady: function(){
+		var fn, reReady = /loaded|complete/, js = document.createElement('script');
+		if(js.readyState) fn = function(js, handler){
+			js.onreadystatechange = function(e){
+				if(!reReady.test(this.readyState)) return;
+				this.onreadystatechange = null;
+				handler.call(this, e);
+			};
+		};
+		else fn = function(js, handler){
+			js.onload = function(e){
+				this.onload = null;
+				handler.call(this, e);
+			};
+		};
+		return fn;
+	}(),
+	init: function(){
 		if(/setup/.test(document.body.className)) return;
 		document.body.className += ' setup';
-	// create QUnit required page elements
 		options.swarm = options.swarm || 'http://testswarm.wetpaint.me';
-		var mk = et.mk, swarm = options.swarm, testpath = options.testpath || '',
-			p = document.getElementsByTagName('script')[0].parentNode, time = (new Date).getTime();
-		p.appendChild(mk('link', {rel: 'stylesheet', href: swarm.concat('/qunit/qunit/qunit.css'), type: 'text/css' }));
-		p.appendChild(mk('script', {src: swarm.concat('/js/jquery.js')}));
-		p.appendChild(mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')}));
-		p.appendChild(mk('script', {src: swarm.concat('/pavlov/pavlov.js')}));
-		p.appendChild(mk('script', {src: swarm.concat('/js/inject.js')}));
-	
-		var item, i=0, list = testpath.split(',');
-		while(item = list[i++]){
-			item = (item.indexOf('http') == 0) ? item : swarm.concat( item );
-			p.appendChild(mk('script', {src: item.concat('?',time)}));
+		var mk = et.mk, swarm = options.swarm,
+			js, p = document.getElementsByTagName('script')[0].parentNode, time = (new Date).getTime();
+		var isReady = 0, ready = function(){
+			++isReady;
+			if(isReady < 2) return;
+			et.setup();
 		};
+		js = mk('script', {src: swarm.concat('/qunit/qunit/qunit.js')});
+		et.isReady(js, ready);
+		p.appendChild(js);
+		js = mk('script', {src: swarm.concat('/js/jquery.js')})
+		et.isReady(js, ready);
+		p.appendChild(js);
+		p.appendChild(mk('link', {rel: 'stylesheet', href: swarm.concat('/qunit/qunit/qunit.css'), type: 'text/css' }));
+	},
+	setup: function(){
+	// create QUnit required page elements
+		var mk = et.mk, swarm = options.swarm, testpath = options.testpath || '',
+			js, base = document.getElementsByTagName('script')[0].parentNode, time = (new Date).getTime();
+		base.appendChild(mk('script', {src: swarm.concat('/js/inject.js')}));
+
 		var tags = [
 			{h1: ["qunit-header", "QUnit"]},
 			{h2: ["qunit-banner", ""]},
@@ -108,9 +132,9 @@ try{
 		f.appendChild(tag);
 		document.body.appendChild(f);
 
-	// wait for QUnit and jQuery to load before starting to load iframe
+		// wait for QUnit and jQuery to load before starting to load iframe
 		window.initDriver = function(){
-			if(window.jQuery && window.QUnit && QUnit.load){
+			if(/loaded|complete/.test(document.readyState)){
 				clearTimeout(window.initDriver.timer);
 				QUnit.config.autostart = false;
 				window.jq = window.jQuery.noConflict(true);
@@ -122,9 +146,24 @@ try{
 				window.initDriver.timer = setTimeout(window.initDriver,500);
 			};
 		};
-		initDriver();
+
+		js = mk('script', {src: swarm.concat('/pavlov/pavlov.js')});
+		et.isReady(js, function(){
+			var js, item, i=0, list = testpath.split(','), count = 0, len = list.length, go = function(){
+				count++;
+				if(count < len) return;
+				initDriver();
+			};
+			while(item = list[i++]){
+				item = (item.indexOf('http') == 0) ? item : swarm.concat( item );
+				js = mk('script', {src: item.concat('?',time)});
+				et.isReady(js, go);
+				base.appendChild(js);
+			};
+		});
+		base.appendChild(js);
 	} // setup()
-}).setup();
+}).init();
 
 /* et.swarm + et.testpath is loaded, it pushes the tests into et.tests
 // ie et.tests.push(<the-tests>);
@@ -146,6 +185,17 @@ et.tests.push({
 			equal(1, 0, 'failing test');
 			equal(1, 1, 'passing test');
 		});
+	}
+});
+et.tests.push({
+	page:'/bones/articles/wetpaint-exclusive-bones-cast-reveals-how-things-will-change-forever',
+	run: function(){
+		et.modules.setupAndOpenLikegate;
+		var module = et.modules;
+		module.core();
+		module.domains();
+		module.likegate(0,'already-like');
+		QUnit.start();
 	}
 });
 */

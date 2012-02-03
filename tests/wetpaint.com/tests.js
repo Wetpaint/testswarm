@@ -16,10 +16,48 @@ console.log('autostart?',QUnit.config.autostart);
 	$.cookie('wpLikegate','', {path:'/',domain:wp._domain}); $.cookie('wpVisit',2, {path:'/',domain:wp._domain});
 	if(wp.domains[wp.store_name].like){
 		$(wp).trigger('unlike', [{href:wp.domains[wp.store_name].fb_fan_page_url, widget:{}}]).trigger('likegate');
+console.log('trigger');
 	};
 };
 
+QUnit.specify.globalApi = true;
+et.modules.example = function(){
+// debug 
+console.log('example');
+pavlov.specify('An Exampleee',function(){
+describe('a feature is described',function(){
+	var __state;
+	before(function(){
+		__state = 'before';
+		console.log('before:',__state);
+	});
+	after(function(){
+		__state = 'after';
+		console.log('after:',__state);
+	});
+
+	it('is in the running __state',function(){
+	__state = 'running';
+console.log('--state',__state);
+		assert(__state).equals('running');
+	});
+	it('is Not Implemented');
+	it('is arbitrary',function(){
+	__state = 'running';
+console.log('--state',__state);
+		var n = 5;
+		assert(n).equals(5);
+	});
+});
+});
+};
+
 et.modules.likegate = function(index, opt_out){
+console.log('likegate, pavlov?',pavlov);
+	et.modules.example();
+// redo as pavlov thing above
+	return;
+/*
 	et.module('likegate');
 	asyncTest('likegate showing and dismiss on '.concat(opt_out,' click'), function(){
 		expect(10);
@@ -81,6 +119,7 @@ console.log('_gaq..');
 		if(wp.FB.likesdefined) setTimeout(theTest, 2000, 1);
 		else $(wp).bind('likesdefined', theTest);
 	});
+*/
 };
 
 et.modules.domains = function(option){
@@ -126,6 +165,7 @@ et.modules.domains = function(option){
 };
 
 et.tests.push(
+/*
 {
 	page:'/',
 	run: function(){
@@ -142,33 +182,29 @@ et.tests.push(
 		module.core();
 		module.domains();
 		QUnit.start();
-	},
-	after: function(){ console.log('after!'); }
+	}
 },
+*/
 {
 	page:'/bones/articles/wetpaint-exclusive-bones-cast-reveals-how-things-will-change-forever',
-	before: et.modules.setupAndOpenLikegate,
 	run: function(){
+		et.modules.setupAndOpenLikegate;
 		var module = et.modules;
 		module.core();
 		module.domains();
 		module.likegate(0,'already-like');
 		QUnit.start();
-	},
-	after: function(){
-		console.log('after...');
 	}
 }/*,
 {
 	page:'/americas-next-top-model/articles/why-was-angelea-disqualified-from-americas-next-top-model-allstars',
-	before: et.modules.setupAndOpenLikegate,
 	run: function(){
+		et.modules.setupAndOpenLikegate;
 		var module = et.modules;
 		module.core();
 		module.domains();
 		module.likegate(1,'prefer-twitter');
-	},
-	after: et.modules.setupAndOpenLikegate
+	}
 }
 */
 );
