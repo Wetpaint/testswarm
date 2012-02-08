@@ -11,6 +11,20 @@ try{
 (window.et = {
 	expect: 0,
 	completed: 0,
+	before: function(){
+		et.expect++;
+console.log('expect++',et.expect);
+	},
+	after: function(){
+		et.completed++;
+console.log('completed++',et.completed);
+/*
+		if(et.expect == et.completed){
+			var currentTest = et.currentTest;
+			et.next();
+		};
+*/
+	},
 	module: function(name, callbacks){
 		var o = callbacks || {}, setup = o.setup || function(){},
 			teardown = o.teardown || function(){};
@@ -20,6 +34,7 @@ try{
 			}, teardown: function(){
 				teardown();
 				et.completed++;
+console.log();
 				if(et.expect==et.completed){
 					var currentTest = et.currentTest;
 					et.next();
@@ -137,7 +152,7 @@ try{
 			if(/loaded|complete/.test(document.readyState)){
 				clearTimeout(window.initDriver.timer);
 				QUnit.config.autostart = false;
-				window.jq = window.jQuery.noConflict(true);
+				if(!window.jq) window.jq = window.jQuery.noConflict(true);
 				window.$ = window.jQuery = false;
 				jq('iframe').load(et.iframeload);
 				if(!document.getElementById('qunit-results').getElementsByTagName('label').length) QUnit.load();
