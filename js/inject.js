@@ -1,7 +1,7 @@
 (function(){
 
 	var DEBUG = false;
-	var $ = jQuery.noConflict();
+	var $ = jQuery;
 	var doPost = false;
 
 	try {
