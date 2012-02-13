@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-my $DEBUG = 1;
+my $DEBUG = 0;
 # The location of the TestSwarm that you're going to run against, TestSwarm username and authtoken from mysql users table.
 my $SWARM = "http://testswarm.wetpaint.me";
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = (localtime);
