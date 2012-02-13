@@ -57,7 +57,7 @@ while(my ($key, $value) = each %TESTS){
 	push(@query, clean("urls[]") . "=" . clean($value));
 };
 
-print "\n\@query:\n\t" . join("\n\t", @query) . "\n";
+print "\n\@query:\n\t" . join("\n\t", @query) . "\n" if ( $DEBUG );
 my $job_action = "curl -d '". join("&", @query) . "' $SWARM";
 # curl -d 'auth=d09ca36b05e8213ec45ca8f65f86079ed215bfa7&max=10&user=jenkins&job%5Fname=Mon%20run%203%3A45p%202%2F13&browsers=all&output=dump&state=addjob&suites%5B%5D=Article%20Page&urls%5B%5D=http%3A%2F%2Fstage%2Ewetpaint%2Eme%2Fjersey%2Dshore%2Farticles%2Fsammi%2D%2Ddeena%2Ddefend%2Dthe%2Dsituation%2Dhes%2Dnot%2Dgay%2Dhes%2Djust%2Ditalian%2D%2Dexclusive%2D&suites%5B%5D=Home%20Page&urls%5B%5D=http%3A%2F%2Fstage%2Ewetpaint%2Eme%2F' http://testswarm.wetpaint.me
 # Job submitted: http://testswarm.wetpaint.me/job/9/
