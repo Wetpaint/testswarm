@@ -1,35 +1,23 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# CONFIGURE
-
-# The location of the TestSwarm that you're going to run against.
-
-#my $SWARM = "http://swarm.jquery.org";
+my $DEBUG = 1;
+# The location of the TestSwarm that you're going to run against, TestSwarm username and authtoken from mysql users table.
 my $SWARM = "http://testswarm.wetpaint.me";
-
-# Your TestSwarm username.
-my $USER = "jenkins";
-
-## replace this
-# Your authorization token.
-my $AUTH_TOKEN = "d09ca36b05e8213ec45ca8f65f86079ed215bfa7";
-
-# The number of commits to search back through
-my $NUM = 1;
-
-# The maximum number of times you want the tests to be run.
-my $MAX_RUNS = 2;
-
-# The directory in which the checkouts will occur.
-#my $BASE_DIR = "/srv/swarm.jquery.org/htdocs/git/jquery";
-my $BASE_DIR = "/home/testswarm/wetpaint/wetpaint.com";
-my $TRACK_COMPLETED = "/home/testswarm/wetpaint/testswarm/log/wetpaint.com/done.txt";
-
-# The name of the job that will be submitted
-# (pick a descriptive, but short, name to make it easy to search)
-# Note: The string {REV} will be replaced with the current
-#       commit number/hash.
-my $JOB_NAME = "wetpaint.com commit <a href=\"https://github.com/Wetpaint/wetpaint.com/commit/{FREV}\">#{REV}</a>";
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = (localtime);
+$mon++;
+#$min = 1;
+if($min < 10){
+        $min = "0$min";
+};
+#$hour = 12;
+my $meridien = ($hour < 12 ? "a":"p");
+if($hour > 12){
+        $hour = $hour % 12; 
+};
+my $insert = $hour == 12 && $min == "01" ? "midday ": ($hour == 6 && $min == "01" ? "evening ":"");
+my $day = qw(Sun Mon Tue Wed Thu Fri Sat)[$wday];
+my $JOB_NAME = "$day$insert run $hour:$min$meridien $mon/$mday";
+print "\ncreate job: $JOB_NAME\n" if ( $DEBUG );
 
 # The browsers you wish to run against. Options include:
 #  - "all" all available browsers.
@@ -41,106 +29,50 @@ my $JOB_NAME = "wetpaint.com commit <a href=\"https://github.com/Wetpaint/wetpai
 #  - "popularbeta" the most popular browser and their upcoming releases
 #  - "popularbetamobile" the most popular browser and their upcoming releases and mobile browsers
 my $BROWSERS = "all";
-
-# All the suites that you wish to run within this job
-# (can be any number of suites)
-
-## insert static suite list here
-my $SUITE = "$SWARM/tests";
-my %SUITES = (
-	basic => "http://www.stage.wetpaint.me/testswarm_qunit_tests.html"
+my $TEST_DOMAIN = "http://stage.wetpaint.me";
+my %TESTS = (
+	"Home Page" => "/",
+	"Article Page" => "/jersey-shore/articles/sammi--deena-defend-the-situation-hes-not-gay-hes-just-italian--exclusive-"
 );
-# sets up curl calls like:
-# curl -d "auth=85d8b5f53fd373788319aa69a39288cd05595e01&job_name=wetpaint%2Ecom%20commit%20%3Ca%20href%3D%22https%3A%2F%2Fgithub%2Ecom%2FWetpaint%2Fwetpaint%2Ecom%2Fcommit%2F3e9e94d814ab13a115dce8a15c9990da6e6993aa%22%3E%233e9e94d%3C%2Fa%3E&max=5&user=jmontgomery&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http%3A%2F%2Ftestswarm%2Ewetpaint%2Eme%3A81%2Ftests%2Ftest%2Ehtml" http://testswarm.wetpaint.me:81
 
-
-sub BUILD_SUITES {
-
-}
-
-########### NO NEED TO CONFIGURE BELOW HERE ############
-
-my $DEBUG = 1;
-
-if ( ! -e $BASE_DIR ) {
-    die "Problem locating source.";
-}
-
-print "chdir $BASE_DIR\n" if ( $DEBUG );
-chdir( $BASE_DIR );
-
-print "git log -$NUM --reverse --pretty='format:%H'\n" if ( $DEBUG );
-my @revs = split(/\n/, `git log -$NUM --reverse --pretty='format:%H'`);
-my %done = map { $_ => 1 } split(/\n/, `cat $TRACK_COMPLETED`);
-
-foreach my $frev ( @revs ) {
-	my $rev = $frev;
-	$rev =~ s/^(.{7}).*/$1/;
-	print "rev:$rev\n" if ( $DEBUG );
-
-	if ( !exists $done{ $rev } ) {
-		print "New revision: $rev\n" if ( $DEBUG );
-
-print " - try to BUILD_SUITES() \n" if ($DEBUG);
-		if ( exists &BUILD_SUITES ) {
-print " + BUILD_SUITES() \n" if ($DEBUG);
-			&BUILD_SUITES();
-		}
-
-		my %props = (
+my %props = (
 			"state" => "addjob",
-			"output" => "dump",
-			"user" => $USER,
-			"max" => $MAX_RUNS,
 			"job_name" => $JOB_NAME,
-			"browsers" => $BROWSERS,
-			"auth" => $AUTH_TOKEN
-		);
+			"output" => "dump",
+			"user" => "jenkins",
+			"auth" => "d09ca36b05e8213ec45ca8f65f86079ed215bfa7",
+			"max" => 10,
+			"browsers" => "all"
+);
+my @query = ();
+while(my ($key, $value) = each %props){
+	print "\tset $key=$value\n" if ( $DEBUG );
+	push(@query, clean($key) . "=" . clean($value));
+};
+while(my ($key, $value) = each %TESTS){
+	$value = $TEST_DOMAIN . $value;
+	print "\tadding suite $key\n" if ( $DEBUG );
+	print "\twith url $value\n" if ( $DEBUG );
+	push(@query, clean("suites[]") . "=" . clean($key));
+	push(@query, clean("urls[]") . "=" . clean($value));
+};
 
-		my $query = "";
-
-		foreach my $prop ( keys %props ) {
-			$query .= ($query ? "&" : "") . $prop . "=" . clean($props{$prop}, $rev, $frev);
-		}
-
-		foreach my $suite ( sort keys %SUITES ) {
-			$query .= "&suites[]=" . clean($suite, $rev, $frev) .
-		          	"&urls[]=" . clean($SUITES{$suite}, $rev, $frev);
-		}
-
-		print "curl -d \"$query\" $SWARM\n" if ( $DEBUG );
-
-		my $results = `curl -d "$query" $SWARM`;
-
-		print "Results: $results\n" if ( $DEBUG );
-
-		if ( $results ) {
-			$done{ $rev } = 1;
-
-		} else {
-			print "Job not submitted properly.\n";
-		}
-
-	} else {
-		print "Old revision: $rev\n" if ( $DEBUG );
-	}
+print "\n\@query:\n\t" . join("\n\t", @query) . "\n";
+my $job_action = "curl -d '". join("&", @query) . "' $SWARM";
+# curl -d 'auth=d09ca36b05e8213ec45ca8f65f86079ed215bfa7&max=10&user=jenkins&job%5Fname=Mon%20run%203%3A45p%202%2F13&browsers=all&output=dump&state=addjob&suites%5B%5D=Article%20Page&urls%5B%5D=http%3A%2F%2Fstage%2Ewetpaint%2Eme%2Fjersey%2Dshore%2Farticles%2Fsammi%2D%2Ddeena%2Ddefend%2Dthe%2Dsituation%2Dhes%2Dnot%2Dgay%2Dhes%2Djust%2Ditalian%2D%2Dexclusive%2D&suites%5B%5D=Home%20Page&urls%5B%5D=http%3A%2F%2Fstage%2Ewetpaint%2Eme%2F' http://testswarm.wetpaint.me
+# Job submitted: http://testswarm.wetpaint.me/job/9/
+print "POST job with command:\n$job_action\n" if ( $DEBUG );
+my $results;
+$results = `$job_action`;
+if ( $results ) {
+	print "Job submitted: $SWARM/$results\n" if ( $DEBUG );
+} else {
+	print "Job not submitted $results\n" if ( $DEBUG );
 }
-
-print "Saving completed revisions.\n" if ( $DEBUG );
-
-open( DONE, ">$TRACK_COMPLETED");
-foreach my $key ( keys %done ) {
-	print DONE "$key\n";
-}
-close( DONE );
 
 sub clean {
 	my $str = shift;
-	my $rev = shift;
-	my $frev = shift;
-
-	$str =~ s/{REV}/$rev/g;
-	$str =~ s/{FREV}/$frev/g;
+	# escape the text
 	$str =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 	$str;
 }
