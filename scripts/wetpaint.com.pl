@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
-
+# 1 12,18 * * 0-5 /home/testswarm/wetpaint/testswarm/scripts/wetpaint.com.pl
+#
 my $DEBUG = 0;
 # The location of the TestSwarm that you're going to run against, TestSwarm username and authtoken from mysql users table.
 my $SWARM = "http://testswarm.wetpaint.me";
