@@ -1,48 +1,53 @@
-
 <Wetpaint>
+TestSwarm is a way of distributing JavaScript testing. A job with a given label is submitted. This job has urls to visit each with its own name. Clients visit TestSwarm and join in to run jobs, reporting successes and failures across domains to the service using window.postMessage (via the /js/inject.js file). Writing tests is separate, but support is built-in for QUnit and a few other frameworks.
 
-TestSwarm documentation:
+Documentation:
 https://github.com/jquery/testswarm/wiki
 Source:
 https://github.com/Wetpaint/testswarm
 Upstream source:
 https://github.com/jquery/testswarm
 
-TO ADD a project:
-create a directory in /log/ with the repo name (eg /log/wetpaint.com/)
-copy the /scripts/wetpaint.com.pl and set it up for that project
-run the script: cd scripts && perl wetpaint.com.pl
-start running tests by visiting the testswarm address and joining the swarm: http://testswarm.wetpaint.me
+For a high level overview of our setup, including writing tests see:
+https://github.com/Wetpaint/wetpaint.com/wiki/Testing-UI+JavaScript
 
-TO ADD tests:
-read the HOWTO in /tests/ and see the sample in that directory.
-
-TO CLEANUP old tests:
+To access testswarm:
 ssh dev@hudson.wetpaint.me su - testswarm
 or ssh testswarm@hudson.wetpaint.me
-cd ~testswarm/wetpaint/testswarm/ && rm log/wetpaint.com/done.txt && mysql testswarm -u testswarm -p < config/reset.sql
 
+To remove the old jobs:
+mysql testswarm -u testswarm -p < config/reset.sql 
 
-TO WRITE QUnit tests:
-see the HOWTO in /tests/
+To remove all the old tests and update the useragents lists:
+mysql testswarm -u testswarm -p < config/cleanup.sql
+mysql testswarm -u testswarm -p < config/useragents.sql 
 
 TO add jobs:
-run the perl script, or do so manually (details next)
-or setup the job via Hudson
+run the perl script in scripts/wetpaint.com.pl
+or via Jenkins on hudson.wetpaint.me
+or manually by visiting testswarm.wetpaint.me and then doing this in the console:
+var _domain = 'http://stage.wetpaint.me';
+jQuery.ajax({
+	type: 'POST',
+	data: {
+	job_name: 'good job',
+	max: 10,
+	user: "jenkins",
+	auth: "---the-token-from-the-mysql-user-table-for-the-above-user-",
+	browsers: 'all',
+	output: "dump",
+	state: "addjob",
+	'suites[]': ["Home","Article"],
+	'urls[]': [_domain.concat("/"),_domain.concat("/jersey-shore/articles/sammi--deena-defend-the-situation-hes-not-gay-hes-just-italian--exclusive-")]
+	},
+	url: 'http://testswarm.wetpaint.me',
+	traditional: true,
+	success: function(data){
+		console.log(data);
+	}
+});
 
-TO manually add a job to testswarm:
-http://testswarm.me/?auth=12345key&job_name=goodjob&max=5&user=jim&browsers=all&output=dump&state=addjob&suites[]=basic&urls[]=http://testswarm.me/tests/test.html
-	auth=12345key and 
-	user=jim are setup by signing up to your testswarm and then getting the user and auth value from the testswarm mysql db users table
-	job_name=label is whatever string you want
-	max=5 the max number of times to run the test
-	browsers=all values are explained in the sample scripts
-	suites[]=label are arbitrary as far as I can tell
-	urls[]=http... are fully qualified address of your test (each with the /js/inject.js added per the testswarm wiki)
-	output=dump not sure what other options exist
-	state=addjob this adds the job
-
-TO SETUP testswarm:
+resources for setup:
 https://github.com/jquery/testswarm/wiki
 http://blog.jcoglan.com/2011/07/20/refactoring-towards-testable-javascript-part-3/
 http://wiki.collectionspace.org/display/collectionspace/Step+1+-+Notes+for+Installing+TestSwarm
@@ -51,6 +56,8 @@ http://sweetnr.com/post/integrating-test-swarm-with-hudson
 
 jenkins-testswarm plugin:
 https://github.com/appendto/jenkins-testswarm
+
+The remaining material is from the original README.
 </Wetpaint>
 
 TestSwarm v0.2.0pre - Distributed continuous integration for JavaScript.
