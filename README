@@ -1,15 +1,16 @@
 <Wetpaint>
 TestSwarm is a way of distributing JavaScript testing. A job with a given label is submitted. This job has urls to visit each with its own name. Clients visit TestSwarm and join in to run jobs, reporting successes and failures across domains to the service using window.postMessage (via the /js/inject.js file). Writing tests is separate, but support is built-in for QUnit and a few other frameworks.
 
+Where:
+http://testswarm.wetpaint.me/
+For a high level overview of our setup, including writing tests see:
+https://github.com/Wetpaint/wetpaint.com/wiki/Testing-UI+JavaScript
 Documentation:
 https://github.com/jquery/testswarm/wiki
-Source:
+Origin source:
 https://github.com/Wetpaint/testswarm
 Upstream source:
 https://github.com/jquery/testswarm
-
-For a high level overview of our setup, including writing tests see:
-https://github.com/Wetpaint/wetpaint.com/wiki/Testing-UI+JavaScript
 
 To access testswarm:
 ssh dev@hudson.wetpaint.me su - testswarm
@@ -24,8 +25,8 @@ mysql testswarm -u testswarm -p < config/useragents.sql
 
 TO add jobs:
 run the perl script in scripts/wetpaint.com.pl
-or via Jenkins on hudson.wetpaint.me
-or manually by visiting testswarm.wetpaint.me and then doing this in the console:
+or via Jenkins on http://hudson.wetpaint.me:8080/job/wetpaint.com-TestSwarm/
+or manually by visiting http://testswarm.wetpaint.me and then doing this in the console:
 var _domain = 'http://stage.wetpaint.me';
 jQuery.ajax({
 	type: 'POST',
