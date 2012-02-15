@@ -15,7 +15,7 @@ my $meridien = ($hour < 12 ? "a":"p");
 if($hour > 12){
         $hour = $hour % 12; 
 };
-my $insert = $hour == 12 && $min == "01" ? "midday ": ($hour == 6 && $min == "01" ? "evening ":"");
+my $insert = $hour == 12 && $min == "01" ? " midday": ($hour == 6 && $min == "01" ? " evening":"");
 my $day = qw(Sun Mon Tue Wed Thu Fri Sat)[$wday];
 my $JOB_NAME = "$day$insert run $hour:$min$meridien $mon/$mday";
 print "\ncreate job: $JOB_NAME\n" if ( $DEBUG );
