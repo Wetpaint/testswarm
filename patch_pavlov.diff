@@ -1,0 +1,29 @@
+diff --git pavlov.js pavlov.js
+index 139472e..63f0c20 100755
+--- pavlov.js
++++ pavlov.js
+@@ -516,7 +516,7 @@
+         // set the test suite title
+         name += " Specifications";
+         if (typeof document !== 'undefined') {
+-            document.title = name + ' - Pavlov - ' + adapter.name;
++//            document.title = name + ' - Pavlov - ' + adapter.name;
+         }
+ 
+         // run the adapter initiation
+@@ -632,6 +632,7 @@
+             };
+ 
+             // after suite loads, set the header on the report page
++/*
+             addEvent(window,'load',function () {
+                 // document.getElementsByTag('h1').innerHTML = name;
+                 var h1s = document.getElementsByTagName('h1');
+@@ -639,6 +640,7 @@
+                     h1s[0].innerHTML = name;
+                 }
+             });
++*/
+         },
+         /**
+          * Implements assert against QUnit's `ok`
