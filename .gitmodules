@@ -7,3 +7,6 @@
 [submodule "pavlov"]
 	path = pavlov
 	url = https://github.com/mmonteleone/pavlov.git
+[submodule "mockjax"]
+	path = mockjax
+	url = https://github.com/appendto/jquery-mockjax.git
