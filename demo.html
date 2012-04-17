@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><title>das das das</title>
-<script type="text/javascript" src="/javascripts/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="http://testswarm.wetpaint.me/js/jquery.js"></script>
 <script type="text/javascript" src="http://testswarm.wetpaint.me/mockjax/jquery.mockjax.js"></script>
 <script type="text/javascript" src="http://testswarm.wetpaint.me/qunit/qunit/qunit.js"></script>
 <script type="text/javascript" src="http://testswarm.wetpaint.me/pavlov/pavlov.js"></script>
@@ -99,8 +99,8 @@ var das = {
 	arr3: [1,2,5,7],
 	click: function(e){
 		console.log(e.type,this,e);
-		$.ajax({type: 'GET', url: '/das.html',complete:function(e,f,g){
-			console.log('GET /das.html',e,f,g);
+		$.ajax({type: 'GET', url: '/demo',complete:function(e,f,g){
+			console.log('GET /demo',e,f,g);
 		}});
 	}, // click
 	whatevs: function(e){
