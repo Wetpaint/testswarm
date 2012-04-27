@@ -13,24 +13,29 @@
  *
  * created late April 2012 
  *
+ * link in with HUDSON using NodeJS plugin
+ * https://wiki.jenkins-ci.org/display/JENKINS/NodeJS+Plugin
+ *
+ * use ENV vars like:
+ * console.log(process.env['WORKSPACE']);
+ *
+ * to have Hudson build fail just throw an error
+ *
  * TODO
- * browser variations
- * chrome, FF, IE8, IE9, etc
- * a mobile scenario?
- * IE8 and chrome (fast and slow browsers)
+ * basic comparisons of performance to see trends
  *
- * reporting
- *
- * calculating values for Hudson?
  *
  * */
 
 var debug = true;
 var http = require('http');
 var fs = require('fs');
-var libxmljs = require('libxmljs');
+var _hudson_workspace = process.env['WORKSPACE'] || '';
+// ssh to the process.env['WORKSPACE'] and run 'sudo npm install libxmljs'
+var libxmljs = require(_hudson_workspace ? _hudson_workspace.replace(/workspace/,'node_modules/libxmljs'):'libxmljs');
+//console.log('Current directory: ' + process.cwd());
 var domain = "http://www.stage.wetpaint.me";
-var filename = 'webpagetest-tests.json';
+var filename = (_hudson_workspace || '' ) + 'webpagetest-tests.json';
 /* 
  * NOTE browsers and connection speed are set in the location
  * values and details are at:
@@ -48,12 +53,14 @@ var testBrowsers = {
 };
 var testPaths = [
 "/",
+/*
 "/shows",
 "/gossip",
 "/glee",
 "/glee/spoilers",
 "/glee/gallery/spoiler-photos-for-glee-season-3-episode-17-dance-with-somebody-the-whitney-houston-tribute",
 "/glee/articles/glee-spoiler-roundup-does-quinn-die-what-we-know-so-far"
+*/
 ];
 var pending = 0;
 var count = 0;
@@ -235,10 +242,23 @@ function save_tests(){
 		if(debug) console.log( err ? ("error writing file:",err):("saved tests to:",filename));
 	});
 };
+
+function hudson_continuous_integration_operations(){
+	collect_test_results();
+	begin_tests();
+};
+
 function get_saved_tests(){
 	if(debug) console.log('get_saved_tests');
-	require('path').exists(filename, function(exists){
-	if(!exists) return handle_command_line_invocation();
+	fs.exists(filename, function(exists){
+	function finished_loading(){
+		if(_hudson_workspace){
+			hudson_continuous_integration_operations();
+		}else{
+			handle_command_line_invocation();
+		};
+	}
+	if(!exists) return finished_loading();
 	fs.readFile(filename,'utf8',function(err, data){
 		if(err){
 			if(debug) console.log('error:', err);
@@ -252,7 +272,8 @@ function get_saved_tests(){
 		};
 
 		if(debug) console.log('read data from file');
-		handle_command_line_invocation();
+
+		finished_loading();
 	});
 	});
 };
