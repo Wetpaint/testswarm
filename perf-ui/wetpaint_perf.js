@@ -30,12 +30,13 @@
 var debug = true;
 var http = require('http');
 var fs = require('fs');
-var _hudson_workspace = process.env['WORKSPACE'] || '';
+var _hudson_workspace = process.env['WORKSPACE'];
 // ssh to the process.env['WORKSPACE'] and run 'sudo npm install libxmljs'
 var libxmljs = require(_hudson_workspace ? _hudson_workspace.replace(/workspace/,'node_modules/libxmljs'):'libxmljs');
 //console.log('Current directory: ' + process.cwd());
 var domain = "http://www.stage.wetpaint.me";
-var filename = (_hudson_workspace || '' ) + 'webpagetest-tests.json';
+// console.log(process.argv[1].replace(/^(.*\/).*$/,'$1'));
+var filename = (_hudson_workspace || process.cwd() ) + '/' + 'webpagetest-tests.json';
 /* 
  * NOTE browsers and connection speed are set in the location
  * values and details are at:
@@ -146,7 +147,7 @@ function get_completed_test_for(id){
 			};
 
 			if(!xml || !xml.length){
-				if(debug) console.log('cannot get completed test with id ',id,' due to xml problem');
+			if(debug) console.log('cannot get completed test with id ',id,' due to xml problem: NOTE if the test was recently submitted it might not be finished');
 				if(pending <= 0) save_tests()
 				return;
 			};
@@ -205,6 +206,7 @@ function setup_test_for(_path){
 };
 
 function warm_stage(_path){
+	if(debug) console.log('warm stage for',_path);
 // make sure stage is working AND varnish has the url cached
 	http.get({
 		host: 'stage.wetpaint.me',
@@ -244,13 +246,15 @@ function save_tests(){
 };
 
 function hudson_continuous_integration_operations(){
+	if(debug) console.log('hudson_continuous_integration_operations');
 	collect_test_results();
 	begin_tests();
 };
 
 function get_saved_tests(){
 	if(debug) console.log('get_saved_tests');
-	fs.exists(filename, function(exists){
+	var x = typeof fs.exists != 'undefined' ? fs : require('path');
+	x.exists(filename, function(exists){
 	function finished_loading(){
 		if(_hudson_workspace){
 			hudson_continuous_integration_operations();
@@ -282,16 +286,24 @@ function report_json(){
 	console.log(require('util').inspect(tests,false,null));
 };
 
+function compare_data(){
+	// TODO
+	var byUrl = {};
+	for(var test in tests){
+		console.log('test:', require('util').inspect(tests[test],false,null));
+	};
+};
+
 function handle_command_line_invocation(){
 	var argv = process.argv, item, ok = 0;
 	var options = {
 		'new': "start new tests for all our url's",
 		'process': 'go get recently-ran tests',
-		'report': "print out what's known"
+		'report': "print out what's known",
+		'compare': "somehow compare the data (in-progress)",
 	};
 	function usage(){
 		console.log('usage:\nnode script option');
-		console.log('where option is one of: new, process, report');
 		console.log('eg:\nnode '+__filename+' process');
 		console.log('these are the options:\n',options);
 	};
@@ -313,6 +325,11 @@ function handle_command_line_invocation(){
 			++ok;
 			report_json();
 		break outer;
+		case 'compare':
+// just tell me what you have
+			++ok;
+			report_json();
+		break outer;
 		default:
 		};
 	};
@@ -320,7 +337,7 @@ function handle_command_line_invocation(){
 };
 
 process.on('exit',function(){
-	if(debug) console.log('All done, have a great day!');
+	console.log('All done, have a great day!');
 });
 
 get_saved_tests();
