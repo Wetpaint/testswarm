@@ -288,9 +288,11 @@ function report_json(){
 
 function compare_data(){
 	// TODO
-	var byUrl = {};
-	for(var test in tests){
-		console.log('test:', require('util').inspect(tests[test],false,null));
+	var t, test, byUrl = {};
+	var max = 0;
+	for(t in tests){
+		test = tests[t];
+		console.log('test:', test.time, test.url, require('util').inspect(test,false,null));
 	};
 };
 
@@ -328,7 +330,7 @@ function handle_command_line_invocation(){
 		case 'compare':
 // just tell me what you have
 			++ok;
-			report_json();
+			compare_data();
 		break outer;
 		default:
 		};
