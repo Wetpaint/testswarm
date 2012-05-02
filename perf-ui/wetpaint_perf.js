@@ -249,6 +249,7 @@ function hudson_continuous_integration_operations(){
 	if(debug) console.log('hudson_continuous_integration_operations');
 	collect_test_results();
 	begin_tests();
+	compare_data();
 };
 
 function get_saved_tests(){
@@ -287,13 +288,44 @@ function report_json(){
 };
 
 function compare_data(){
-	// TODO
 	var t, test, byUrl = {};
-	var max = 0;
+	var problems = [];
+	// various attributes and values for the labels & data provided by webpagetest.org
+	var desired = {
+		TTFB:{label:'first-byte',max:400},
+		docTime:{label:'document-ready',max:3000},
+		render:{label:'start render',max:3000},
+		fullyLoaded:{label:'loaded',max:6000},
+		browser_name:{label:'browser'},
+		browser_version:{label:'version'},
+	};
+
+	function results(view, test){
+		var result = [], p, n, warn;
+		view = test.result[view];
+		for(p in view){
+			if(!desired[p]) continue;
+			n = view[p]*1;
+			warn = (desired[p].max ? (isNaN(n) || n >= desired[p].max?'*':''):'')
+			if(warn) problems.push('over limit for '+p+' of '+view[p]+' (max '+desired[p].max+') on '+test.url +' see http://'+webpagetest+'/'+test.id);
+			result.push(desired[p].label + ': '+view[p] + (isNaN(n) ? '':'ms'), warn);
+		};
+		return result.join(', ');
+	};
+
 	for(t in tests){
 		test = tests[t];
-		console.log('test:', test.time, test.url, require('util').inspect(test,false,null));
+		console.log('test:', test.url);
+		console.log((new Date(test.time)).toString(), ' http://'+webpagetest+'/'+test.id);
+		if(!test.result){
+			console.log('results: no results yet');
+			continue;
+		};
+		console.log('first view:',results('firstView', test));
+		console.log('repeat view:',results('repeatView', test));
+		console.log('');
 	};
+	console.log('problems ('+problems.length+'):\n'+problems.join('\n')+'\n');
 };
 
 function handle_command_line_invocation(){
@@ -302,7 +334,7 @@ function handle_command_line_invocation(){
 		'new': "start new tests for all our url's",
 		'process': 'go get recently-ran tests',
 		'report': "print out what's known",
-		'compare': "somehow compare the data (in-progress)",
+		'compare': "somehow compare the data",
 	};
 	function usage(){
 		console.log('usage:\nnode script option');
